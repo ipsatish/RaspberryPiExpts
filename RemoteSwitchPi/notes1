@@ -1,0 +1,125 @@
+    1  ifconfig
+    2  sudo ifup wlan0
+    3  ifconfig
+    4  sudo restart
+    5  sudo shutdown now
+    6  ifconfig
+    7  lsusb
+    8  sudo shutdown now
+    9  sudo apt-install update
+   10  sudo apt-get update
+   11  ifconfig
+   12  ping www.google.com
+   13  sudo apt-get update
+   14  ifconfig
+   15  lsusb
+   16  uname -a
+   17  lsmod
+   18  lsusb
+   19  sudo apt-get install rpi-update
+   20  sudo apt-get upgrade
+   21  sudo reboot
+   22  wget https://dl.dropboxusercontent.com/u/80256631/8188eu-20140307.tar.gz
+   23  tar -zxvf 8188eu-20140307.tar.gz 
+   24  sudo install -p -m 644 8188eu.ko /lib/modules/3.12.35+/kernel/drivers/net/wireless/
+   25  sudo insmod /lib/modules/3.12.35+/kernel/drivers/net/wireless/8188eu.ko 
+   26  wget https://dl.dropboxusercontent.com/u/80256631/8188eu*
+   27  sudo insmod /lib/modules/3.12.35+/kernel/drivers/net/wireless/8188eu.ko 
+   28  sudo yom install kernel-headers
+   29  sudo yum install kernel-headers
+   30  uname -a
+   31  wget https://dl.dropboxusercontent.com/u/80256631/8188eu-20141107.gz
+   32  wget https://dl.dropboxusercontent.com/u/80256631/8188eu-20141107.tar.gz
+   33  ls
+   34  ls -ltr
+   35  tar -zxvf 8188eu-20141107.tar.gz 
+   36  sudo install -p -m 644 8188eu.ko /lib/modules/3.12.35+/kernel/drivers/net/wireless/
+   37  sudo insmod /lib/modules/3.12.35+/kernel/drivers/net/wireless/8188eu.ko 
+   38  sudo depmod -a
+   39  sudo reboot
+   40  ifconfig
+   41  vi /etc/network/interfaces 
+   42  sudo vi /etc/wpa_supplicant/wpa_supplicant.conf 
+   43  sudo vi /etc/network/interfaces 
+   44  sudo ifdown wlan0
+   45  sudo ifup wlan0
+   46  ifconfig
+   47  sudo ifup wlan0
+   48  ifconfig
+   49  sudo reboot
+   50  ifconfig
+   51  netstat -nr
+   52  sudo apt-get install tightvncserver
+   53  tightvncserver
+   54  vi svnc.sh
+   55  chmod +x svnc.sh 
+   56  sudo /etc/init.d/vncboot
+   57  sudo vi/etc/init.d/vncboot
+   58  sudo vi /etc/init.d/vncboot
+   59  chmod 755 /etc/init.d/vncboot 
+   60  sudo chmod 755 /etc/init.d/vncboot 
+   61  update-rc.d /etc/init.d/vncboot
+   62  update-rc.d /etc/init.d/vncboot defaults
+   63  update-rc.d vncboot defaults
+   64  sudo update-rc.d vncboot defaults
+   65  sudo reboot
+   66  ls
+   67  ifconfig
+   68  sudo ifup wlan0
+   69  ps -ef | grep vnc
+   70  more /etc/init.d/vncboot 
+   71  ./vncserver :1 1024x768 -depth 16
+   72  vncserver :1 1024x768 -depth 16
+   73  more /etc/init.d/vncboot 
+   74  vncserver :1 -geometry 1024x768 -depth 16
+   75  sudo shutdown now
+   76  ls
+   77  ./svnc.sh 
+   78  vi svnc.sh 
+   79  ./svnc.sh 
+   80  sudo apt-get install fswebcam
+   81  fsbwebcam image.jpg
+   82  sudo fswebcam image.jpg
+   83  sudo fswebcam image.jpg 
+   84  sudo apt-get install motion
+   85  vi /etc/motion/motion.conf 
+   86  sudo vi /etc/motion/motion.conf 
+   87  vi /etc/default/motion 
+   88  sudo vi /etc/default/motion 
+   89  sudo service motion startt
+   90  sudo service motion start
+   91  sudo vi /etc/motion/motion.conf 
+   92  sudo service motion stop
+   93  sudo service motion start
+   94  wget https:/github.com/weaved/installer/raw/master/binaries/weaved-nixinstaller_1.2.5.bin
+   95  wget https://github.com/weaved/installer/raw/master/binaries/weaved-nixinstaller_1.2.5.bin
+   96  chmod +x weaved-nixinstaller_1.2.5.bin 
+   97  ./weaved-nixinstaller_1.2.5.bin 
+   98  more /etc/weaved/services/Weavedweb80.conf 
+   99  pwd
+  100  sudo vi /etc/motion/motion.conf 
+  101  sudo service motion stop
+  102  sudo service motion start
+  103  sudo vi /etc/motion/motion.conf 
+  104  sudo service motion stop
+  105  sudo service motion start
+  106  sudo apt-get install apache
+  107  sudo apt-get install apache2 -y
+  108  sudo vi /etc/motion/motion.conf 
+  109  ./weaved-nixinstaller_1.2.5.bin 
+  110  sudo apt-get install php5 libapache2-mod-php5 -y
+  111  sudo apt-get install php5 libapache2-mod-php5 -y --fix-missing
+  112  ls
+  113  cd /var/www/
+  114  ls
+  115  mv index.html index.php
+  116  sudo mv index.html index.php
+  117  pwd
+  118  sudo vi index.php 
+  119  sudo service motion stop
+  120  sudo service motion start
+  121  ls
+  122  cd
+  123  pwd
+  124  history
+  125  history > notes1
