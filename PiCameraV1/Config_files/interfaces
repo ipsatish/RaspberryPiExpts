@@ -1,0 +1,27 @@
+auto lo
+
+iface lo inet loopback
+iface eth0 inet dhcp
+
+#Uncomment for Wifi STA mode
+allow-hotplug wlan0
+iface wlan0 inet manual
+wpa-roam /etc/wpa_supplicant/wpa_supplicant.conf
+iface default inet dhcp
+iface MyPiCamera inet static
+address 192.168.10.201
+netmask 255.255.255.0
+gateway 192.168.10.1
+network 192.168.10.0
+broadcast 192.168.10.255
+
+#UnComment for AP mode
+#auto wlan0
+##Below lines for HotSpot/AP mode
+#iface wlan0 inet static
+#address 192.168.10.201
+#netmask 255.255.255.0
+
+#auto br0
+#iface br0 inet dhcp 
+#bridge_ports eth0 wlan0
