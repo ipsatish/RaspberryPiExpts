@@ -1,46 +1,46 @@
-
-GPIO.setmode(GPIO.BCM)
-shutdown_button = 21
-click_button = 17
-timer_button = 18
-camera_mode_button = 19
-
-#Camera click control
-GPIO.setup(click_button, GPIO.IN, GPIO.PUD_UP)
-
-#Camera click timer for selfies
-GPIO.setup(timer_button, GPIO.IN, GPIO.PUD_UP)
-
-#Camera mode control - default(still/image), video recording
-# 0 - Video Rec
-# 1 - Still Camera Mode
-GPIO.setup(camera_mode_button, GPIO.IN, GPIO.PUD_UP)
-
-#Shutdown button
-GPIO.setup(shutdown_button, GPIO.IN, GPIO.PUD_UP)
-
-#Output LEDs
-# Green LED - Power indicator
-pwr_indicator = 2
-GPIO.setup(pwr_indicator, GPIO.OUT, GPIO.PUD_DOWN)
-
-# Red LED - Click/Rec indicator
-click_indicator = 3
-GPIO.setup(click_indicator, GPIO.OUT, GPIO.PUD_DOWN)
-
-#Variable Share Status
-click_pressed = 0
-camera_mode = 0
-
-#Turn on power indicator
-GPIO.output(pwr_indicator, 1)
-
-#Keep the default state of click indicator
-GPIO.output(click_indicator, 0)
-
-
-------------------------------------------------
-
+#
+#GPIO.setmode(GPIO.BCM)
+#shutdown_button = 21
+#click_button = 17
+#timer_button = 18
+#camera_mode_button = 19
+#
+##Camera click control
+#GPIO.setup(click_button, GPIO.IN, GPIO.PUD_UP)
+#
+##Camera click timer for selfies
+#GPIO.setup(timer_button, GPIO.IN, GPIO.PUD_UP)
+#
+##Camera mode control - default(still/image), video recording
+## 0 - Video Rec
+## 1 - Still Camera Mode
+#GPIO.setup(camera_mode_button, GPIO.IN, GPIO.PUD_UP)
+#
+##Shutdown button
+#GPIO.setup(shutdown_button, GPIO.IN, GPIO.PUD_UP)
+#
+##Output LEDs
+## Green LED - Power indicator
+#pwr_indicator = 2
+#GPIO.setup(pwr_indicator, GPIO.OUT, GPIO.PUD_DOWN)
+#
+## Red LED - Click/Rec indicator
+#click_indicator = 3
+#GPIO.setup(click_indicator, GPIO.OUT, GPIO.PUD_DOWN)
+#
+##Variable Share Status
+#click_pressed = 0
+#camera_mode = 0
+#
+##Turn on power indicator
+#GPIO.output(pwr_indicator, 1)
+#
+##Keep the default state of click indicator
+#GPIO.output(click_indicator, 0)
+#
+#
+#------------------------------------------------
+#
 import time
 import Adafruit_SSD1306
 import sys
@@ -91,7 +91,7 @@ def get_menu_option(pin):
 		if (GPIO.input(pin) == 0):
 			time.sleep(0.25)
 			menu_option = menu_option + 1
-			if (menu_option == 5):
+			if (menu_option == 7):
 				menu_option = 0
 			time.sleep(0.25)
 
@@ -203,61 +203,54 @@ def camera_restart():
 		time.sleep(1)
 		os.system ('sudo reboot')
 
-def still_camera_proc():
-	global click_pressed
-	global camera_mode
-	while 1:
-		delay = 0
-		with picamera.PiCamera() as camera:
-			GPIO.wait_for_edge(click_button, GPIO.FALLING)
-			camera.start_preview()
-			print "Camera Mode: Still"
-			GPIO.wait_for_edge(click_button, GPIO.FALLING)
-			GPIO.output(click_indicator, 1)
-			print "Taking snap... Say Cheese!"
-			today = datetime.date.today()
-			string = "PIC_" + str(today.day)+"_" + str(today.month)+"_" + str(today.year)+"_" + str(int(time.time())) + ".jpg"
-			path = "/var/www/img/"
-			filename = path + string
-			print filename
-			if(GPIO.input(timer_button) == 0):
-				delay = 9
-			time.sleep(delay)
-			delay =0
-			camera.capture(filename)
-			GPIO.output(click_indicator, 0)
-			camera.stop_preview()
+def still_camera_proc(delay):
+	with picamera.PiCamera() as camera:
+		GPIO.wait_for_edge(click_button, GPIO.FALLING)
+		print "Camera Mode: Still"
+		GPIO.output(click_indicator, 1)
+		print "Taking snap... Say Cheese!"
+		today = datetime.date.today()
+		string = "PIC_" + str(today.day)+"_" + str(today.month)+"_" + str(today.year)+"_" + str(int(time.time())) + ".jpg"
+		path = "/var/www/img/"
+		filename = path + string
+		print filename
+		time.sleep(delay)
+		camera.capture(filename)
+		GPIO.output(click_indicator, 0)
+
+def still_camera_dummy(delay):
+	display_text("Still Camera Mode")
 
 def video_camera_proc():
-	global click_pressed
-	while 1:
-		with picamera.PiCamera() as camera:
-			GPIO.wait_for_edge(click_button, GPIO.FALLING)
-			camera.start_preview()
-			print "Camera Mode: Video"
-			click_pressed = 1
-			try:
-				thread.start_new_thread(video_rec_indicator,())
-			except:
+	with picamera.PiCamera() as camera:
+		GPIO.wait_for_edge(click_button, GPIO.FALLING)
+		print "Camera Mode: Video"
+		try:
+			thread.start_new_thread(video_rec_indicator,())
+		except:
 			print "Error starting proc: video_rec_indicator!"
-			print "Recording started .."
-			#camera.start_recording('/var/www/img/test_video.h264.mp4')
-			time.sleep(1)
-			GPIO.wait_for_edge(click_button, GPIO.FALLING)
-			#camera.stop_recording()
-			click_pressed = 0
-			print "Recording stopped .."
-			camera.stop_preview()
+		print "Recording started .."
+		#camera.start_recording('/var/www/img/test_video.h264.mp4')
+		time.sleep(1)
+		GPIO.wait_for_edge(click_button, GPIO.FALLING)
+		#camera.stop_recording()
+		print "Recording stopped .."
 
+def video_camera_dummy():
+	display_text("Video Camera Mode")
+
+def wifi_mode():
+	display_text("Wifi Mode")
+	
 def display():	
 	global menu_option
 	while True:
 		if (menu_option == 0):
 			display_clock()
 		elif (menu_option == 1):
-			still_camera_proc()
+			still_camera_dummy(1)
 		elif (menu_option == 2):
-			video_camera_proc()
+			video_camera_dummy()
 		elif (menu_option == 3):
 			wifi_mode()
 		elif (menu_option == 4):
@@ -267,29 +260,26 @@ def display():
 		else:
 			camera_restart()
 
-	
 # Raspberry Pi pin configuration(Board mode):
 NET = 'NONE'
-RST = 16
+OLED_RST = 16
 menu_option_pin = 7
 menu_select_pin = 23
 menu_option = 0
 menu_select = 0
 shutdown = 0
 restart = 0
-
-init_disp(RST)
-config_input(menu_option_pin)
-config_input(menu_select_pin)
-
 x_offset = 10
 y_offset = 10
+
+init_disp(OLED_RST)
+config_input(menu_option_pin)
+config_input(menu_select_pin)
 
 try:
 	thread.start_new_thread(display,())
 	thread.start_new_thread(get_menu_option,(menu_option_pin,))
 	thread.start_new_thread(get_menu_selection,(menu_select_pin,))
-	thread.start_new_thread(camera_proc,())
 except:
 	print 'Error starting threads!'
 
