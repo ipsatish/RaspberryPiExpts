@@ -29,6 +29,8 @@ def init_disp(rst):
 	disp = Adafruit_SSD1306.SSD1306_128_64(rst=RST)
 	GPIO.setmode(GPIO.BOARD)
 	GPIO.setup(rst,GPIO.OUT)
+	GPIO.output(rst,0)
+	time.sleep(0.5)
 	GPIO.output(rst,1)
 	disp.begin()
 # Clear display.
@@ -210,15 +212,15 @@ def display():
 			display_clock()
 			print 'DEBUG: main loop %d' % menu_option
 		elif (menu_option == 1):
-			display_ip_addr()
+			option_restart()
 			print 'DEBUG: main loop %d' % menu_option
-			time.sleep(2)
-			menu_option = 3
-		elif(menu_option == 3):
+		elif(menu_option == 2):
 			option_shutdown()
 			print 'DEBUG: main loop %d' % menu_option
 		else:
-			option_restart()
+			display_ip_addr()
+			time.sleep(2)
+			menu_option = 0
 			print 'DEBUG: main loop %d' % menu_option
 
 def tri_color_led(color1, color2, color3):
