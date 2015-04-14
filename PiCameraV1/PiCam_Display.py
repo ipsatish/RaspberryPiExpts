@@ -1,46 +1,31 @@
-#
-#GPIO.setmode(GPIO.BCM)
-#shutdown_button = 21
-#click_button = 17
-#timer_button = 18
-#camera_mode_button = 19
-#
-##Camera click control
-#GPIO.setup(click_button, GPIO.IN, GPIO.PUD_UP)
-#
-##Camera click timer for selfies
-#GPIO.setup(timer_button, GPIO.IN, GPIO.PUD_UP)
-#
-##Camera mode control - default(still/image), video recording
-## 0 - Video Rec
-## 1 - Still Camera Mode
-#GPIO.setup(camera_mode_button, GPIO.IN, GPIO.PUD_UP)
-#
-##Shutdown button
-#GPIO.setup(shutdown_button, GPIO.IN, GPIO.PUD_UP)
-#
-##Output LEDs
-## Green LED - Power indicator
-#pwr_indicator = 2
-#GPIO.setup(pwr_indicator, GPIO.OUT, GPIO.PUD_DOWN)
-#
-## Red LED - Click/Rec indicator
-#click_indicator = 3
-#GPIO.setup(click_indicator, GPIO.OUT, GPIO.PUD_DOWN)
-#
-##Variable Share Status
-#click_pressed = 0
-#camera_mode = 0
-#
-##Turn on power indicator
-#GPIO.output(pwr_indicator, 1)
-#
-##Keep the default state of click indicator
-#GPIO.output(click_indicator, 0)
-#
-#
-#------------------------------------------------
-#
+##############################################################################################
+# This is a project to teach kids on how the day to day things work or built. The actual Camera
+# is built with Lego blocks, with all the electronics is stuck inside.
+# 
+# Camera Project with RPi and PiCamera interfaced with 128x64 OLED display
+# The PiCamera runs a webserver, which is used to display the images/videos
+# Has a admin page, used to delete images/videos
+# Wifi Mode:
+#		- AP Mode - stand alone mode, no internet access. Outdoor use
+#		- STA Mode - Connected to internet, used for sharing the videos on internet, updating 
+#		  the system (Admin mode)
+# 
+# RPi GPIO interface:
+# Board GPIOs (3,5) - I2C interface for the OLED display
+# 			  16 - Reset for the Display (active-low)
+# 			   7 - Menu Button
+#			  23 - OK / Click Button
+# Uses:
+#	- hostapd (to run AP mode), need a custom hostapd for edimax dongle. Available on 
+#     www.daveconroy.com website, also a copy available in this site.
+#	- udhcpd - DHCP server
+#	- apache (with PHP support) - Web server
+#	- Uses Adafruit library for OLED display control
+#	
+# Author: Satish Panigatti (ipsatish@gmail.com)
+# Date: 14 April 2015
+##############################################################################################
+ 			  
 import time
 import Adafruit_SSD1306
 import sys
@@ -91,7 +76,7 @@ def get_menu_option(pin):
 		if (GPIO.input(pin) == 0):
 			time.sleep(0.25)
 			menu_option = menu_option + 1
-			if (menu_option == 7):
+			if (menu_option == 8):
 				menu_option = 0
 			time.sleep(0.25)
 
@@ -196,7 +181,6 @@ def camera_restart():
 		display_text('Restart?')
 	if (menu_select == 1 or restart == 1):
 		display_text('Restarting ...')
-		print 'DEBUG: restart %d' % restart
 		restart = 1
 		time.sleep(1)
 		display_text('See you soon ...')
@@ -205,40 +189,33 @@ def camera_restart():
 
 def still_camera_proc(delay):
 	with picamera.PiCamera() as camera:
-		GPIO.wait_for_edge(click_button, GPIO.FALLING)
-		print "Camera Mode: Still"
-		GPIO.output(click_indicator, 1)
-		print "Taking snap... Say Cheese!"
-		today = datetime.date.today()
-		string = "PIC_" + str(today.day)+"_" + str(today.month)+"_" + str(today.year)+"_" + str(int(time.time())) + ".jpg"
-		path = "/var/www/img/"
-		filename = path + string
-		print filename
-		time.sleep(delay)
-		camera.capture(filename)
-		GPIO.output(click_indicator, 0)
+		if (menu_select == 1):
+			display_text("Say Cheese!")
+			today = datetime.date.today()
+			string = "PIC_" + str(today.day)+"_" + str(today.month)+"_" + str(today.year)+"_" + str(int(time.time())) + ".jpg"
+			path = "/var/www/img/"
+			filename = path + string
+			time.sleep(delay)
+			camera.capture(filename)
+			display_text("Done...")
 
 def still_camera_dummy(delay):
 	display_text("Still Camera Mode")
 
 def video_camera_proc():
 	with picamera.PiCamera() as camera:
-		GPIO.wait_for_edge(click_button, GPIO.FALLING)
-		print "Camera Mode: Video"
-		try:
-			thread.start_new_thread(video_rec_indicator,())
-		except:
-			print "Error starting proc: video_rec_indicator!"
-		print "Recording started .."
-		#camera.start_recording('/var/www/img/test_video.h264.mp4')
-		time.sleep(1)
-		GPIO.wait_for_edge(click_button, GPIO.FALLING)
-		#camera.stop_recording()
-		print "Recording stopped .."
+		if (menu_select == 1):
+			display_text("Recording...")
+			#camera.start_recording('/var/www/img/test_video.h264.mp4')
+			time.sleep(1)
+		if (menu_select == 1):
+			#camera.stop_recording()
+			display_text("Recording Stop!")
 
 def video_camera_dummy():
 	display_text("Video Camera Mode")
 
+# Have an option select between AP mode and STA mode
 def wifi_mode():
 	display_text("Wifi Mode")
 	
@@ -250,12 +227,14 @@ def display():
 		elif (menu_option == 1):
 			still_camera_dummy(1)
 		elif (menu_option == 2):
-			video_camera_dummy()
+			still_camera_dummy(10)
 		elif (menu_option == 3):
-			wifi_mode()
+			video_camera_dummy()
 		elif (menu_option == 4):
-			display_ip_addr()
+			wifi_mode()
 		elif (menu_option == 5):
+			display_ip_addr()
+		elif (menu_option == 6):
 			camera_shutdown()
 		else:
 			camera_restart()
@@ -265,10 +244,14 @@ NET = 'NONE'
 OLED_RST = 16
 menu_option_pin = 7
 menu_select_pin = 23
+
+#Global variables for messaging between threads
 menu_option = 0
 menu_select = 0
 shutdown = 0
 restart = 0
+
+#Default offset for printing text on the screen
 x_offset = 10
 y_offset = 10
 
